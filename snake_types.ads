@@ -2,7 +2,7 @@ package snake_types is
 
 
 
-        type T_snake_zone is array(1..70,1..20) of boolean ;
+        type T_snake_zone is array(1..20,1..70) of boolean ;
 
         type Snake_direction is (LEFT,RIGHT,UP,DOWN) ;
 

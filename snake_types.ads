@@ -3,19 +3,12 @@ with ada.Containers.Hashed_Maps,display, Ada.Containers.Hashed_Maps,ada.containe
 
 package snake_types is
 
-
-
-
-
-
         type Snake_direction is (LEFT,RIGHT,UP,DOWN) ;
 
         type Coordinates is
                 record
-
-                        x : integer range 1..20  ;
-                        y : integer range 1..70  ;
-
+                        x : integer range display.screen'range(1) ;
+                        y : integer range display.screen'range(2) ;
                 end record ;
 
 
@@ -30,14 +23,6 @@ package snake_types is
                 Element_Type => Snake_direction,
                 Hash => Hash_Func,
                 Equivalent_Keys => "=");
-
-
-
-
-
-
-
-
 
 
 end snake_types ;

@@ -1,11 +1,5 @@
 with snake_types,display ;
 
-
-
-
-
-
-
 package snake_functions is
 
 
@@ -19,7 +13,11 @@ package snake_functions is
                 );
         function get_user_controls_default return snake_types.User_Controls.Map ;
         procedure update_direction(dir : in out snake_types.Snake_direction ; new_direction : snake_types.Snake_direction) ;
-        procedure generate_fruit(fruit : out snake_types.Coordinates ; s : snake_types.snake ; time_out : out integer) ;
+        procedure generate_fruit(
+                s : snake_types.snake ; 
+                fruit : out snake_types.Coordinates ; 
+                time_out : out integer
+                ) ;
         procedure render_game(s : snake_types.snake ; fruit : snake_types.Coordinates) ;
         procedure is_end_of_game(s : snake_types.snake ; end_game : out boolean) ;
 end snake_functions ;

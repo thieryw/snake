@@ -46,11 +46,21 @@ package body snake_functions is
 
         end create_snake ;
 
-        procedure move_snake(s : in out snake_types.Snake ; dir : snake_types.Snake_direction ; fruit_coord : in out snake_types.Coordinates ; time_out : in out integer ; score : in out integer) is
-                procedure snake_through_wall(s : in out snake_types.snake ; dir : snake_types.snake_direction ; head : in out snake_types.Coordinates ; is_on_edge : out boolean)  is
+        procedure move_snake(
+                s : in out snake_types.Snake ; 
+                dir : snake_types.Snake_direction ; 
+                fruit_coord : in snake_types.Coordinates ; 
+                does_eat_fruit: out boolean;
+                ) is
+
+                procedure snake_through_wall(
+                        s : in out snake_types.snake ; 
+                        dir : snake_types.snake_direction ; 
+                        head : in out snake_types.Coordinates ; 
+                        is_on_edge : out boolean
+                        )  is
 
                         c : snake_list.cursor ;
-
 
                 begin
                         if head.x = display.screen'first(1) and dir = UP then
@@ -80,31 +90,20 @@ package body snake_functions is
 
                 end snake_through_wall ;
 
-
                 head : Coordinates ;
-                c : snake_list.cursor ;
-                is_on_edge : boolean := false ;
-
-
 
         begin
-                c := snake_list.first(s) ;
-                head := snake_list.Element(c) ;
-
-
-                snake_through_wall(s,dir,head,is_on_edge) ;
-                if is_on_edge then
-                        snake_list.delete(s,c) ;
-                end if ;
-
-
-
+                head := snake_list.Element(snake_list.first(s)) ;
 
                 case dir is
 
                         when snake_types.UP =>
 
-                                snake_list.prepend(s,(x=>head.x-1,y=>head.y)) ;
+                                if head.x = display.screen'first(1)  then
+                                        snake_list.prepend(s,(x => display.screen'last(1), y => head.y)) ;
+                                else
+                                        snake_list.prepend(s,(x=>head.x-1,y=>head.y)) ;
+                                end if;
 
                         when snake_types.DOWN =>
 
@@ -120,47 +119,29 @@ package body snake_functions is
 
                 end case ;
 
-                c := snake_list.last(s) ;
-
-                if not are_same_coord(snake_list.Element(c), fruit_coord ) then 
-                        snake_list.delete(s,c) ;
+                if not are_same_coord(snake_list.Element(snake_list.last(s)), fruit_coord ) then 
+                        snake_list.delete(s,snake_list.last(s)) ;
+                        does_eat_fruit:= false;
                 else
-                        generate_fruit(fruit_coord,s,time_out) ;
-                        score := score + 1 ;
+                        does_eat_fruit:= true;
                 end if;
-
 
 
         end move_snake ;
 
 
-
-
-
-        procedure is_end_of_game(s : snake_types.snake ; end_game : out boolean) is
-                c_head : snake_list.cursor ;
-                c_tail : snake_list.cursor ;
-
-                snake_tail : snake_types.Coordinates ;
-                snake_head : snake_types.Coordinates ;
-                count : integer := integer(snake_list.length(s)) ;
+        function is_end_of_game(s : snake_types.snake  ) return boolean is
         begin
-                c_head := snake_list.first(s) ;
-                c_tail := snake_list.last(s) ;
-                snake_head := snake_list.Element(c_head) ;
 
-                for i in 1..count - 1 loop 
-                        snake_tail := snake_list.Element(c_tail) ;
+                for snake_tail of s loop
 
-                        if snake_tail.x = snake_head.x and snake_tail.y = snake_head.y then
-                                end_game := true ;
+                        if are_same_coord(snake_tail, snake_head) then
+                                return true;
                         end if ;
-                        c_tail := snake_list.previous(c_tail) ;
-                        snake_tail := snake_list.element(c_tail) ;
 
                 end loop ;
 
-
+                return false;
 
         end is_end_of_game ;
 
@@ -195,6 +176,7 @@ package body snake_functions is
 
 
 
+        --Prevent snake from going back on itself.
         procedure update_direction(
                 dir : in out snake_types.Snake_direction ; 
                 new_direction : snake_types.Snake_direction
@@ -202,13 +184,10 @@ package body snake_functions is
         begin
 
                 if
-                        ( dir = snake_types.UP and new_direction = snake_types.DOWN )
-                        or
-                                ( dir = snake_types.DOWN and new_direction = snake_types.UP )
-                                or
-                                        ( dir = snake_types.LEFT and new_direction = snake_types.RIGHT )
-                                        or
-                                                ( dir = snake_types.RIGHT and new_direction = snake_types.LEFT )
+                        ( dir = snake_types.UP and new_direction = snake_types.DOWN ) or
+                                ( dir = snake_types.DOWN and new_direction = snake_types.UP ) or
+                                        ( dir = snake_types.LEFT and new_direction = snake_types.RIGHT ) or
+                                                ( dir = snake_types.RIGHT and new_direction = snake_types.LEFT ) 
                 then
 
                         return;
@@ -225,7 +204,11 @@ package body snake_functions is
 
 
 
-        procedure generate_fruit(fruit : out snake_types.Coordinates ; s : snake_types.snake ; time_out : out integer) is
+        procedure generate_fruit(
+                s : snake_types.snake ; 
+                fruit : out snake_types.Coordinates ; 
+                time_out : out integer
+                ) is
 
                 procedure random_time_to_generate_fruit(time_out : out integer) is 
                         subtype intervall is integer range 40..90 ;

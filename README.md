@@ -5,9 +5,9 @@ It is just the assigment of openclassroom Ada's tutorial.
  * Os support : Windows
 
  - Compile: 
-    gnatmake -gnatU -g test.adb
+    gnatmake -gnatU -g main.adb
  - Run:
-    Open test.exe
+    Open main.exe
  - Play:
     With controlls: o, k, l, m
 
